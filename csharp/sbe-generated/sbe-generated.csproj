@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\sbe-dll\sbe-dll.csproj" />
+    <Reference Include="Adaptive.Agrona">
+      <HintPath>..\..\..\Aeron.NET\src\Adaptive.Agrona\bin\Release\net45\Adaptive.Agrona.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

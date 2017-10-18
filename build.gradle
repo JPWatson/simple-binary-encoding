@@ -664,6 +664,20 @@ task generateCSharpCodecs(type: JavaExec) {
             'sbe-benchmarks/src/main/resources/fix-message-samples.xml']
 }
 
+task generateCSharpCodecs2(type: JavaExec) {
+    main = 'uk.co.real_logic.sbe.SbeTool'
+    classpath = project(':sbe-all').sourceSets.main.runtimeClasspath
+    systemProperties(
+            'sbe.output.dir': 'csharp/sbe-generated',
+            'sbe.target.language': 'CSharp',
+            'sbe.validation.xsd': validationXsdPath,
+            'sbe.java.generate.interfaces': true
+    )
+    args = [
+            'sbe-samples/src/main/resources/example-schema.xml',
+    ]
+}
+
 task generateJavaIrCodecs(type: JavaExec) {
     main = 'uk.co.real_logic.sbe.SbeTool'
     classpath = project(':sbe-all').sourceSets.main.runtimeClasspath

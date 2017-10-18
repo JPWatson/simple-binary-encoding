@@ -18,6 +18,8 @@ package uk.co.real_logic.sbe.generation;
 import org.agrona.generation.PackageOutputManager;
 import uk.co.real_logic.sbe.generation.cpp.CppGenerator;
 import uk.co.real_logic.sbe.generation.cpp.NamespaceOutputManager;
+import uk.co.real_logic.sbe.generation.csharp2.CSharpGenerator;
+import uk.co.real_logic.sbe.generation.csharp2.CSharpOutputManager;
 import uk.co.real_logic.sbe.generation.golang.GolangGenerator;
 import uk.co.real_logic.sbe.generation.golang.GolangOutputManager;
 import uk.co.real_logic.sbe.generation.java.JavaGenerator;
@@ -47,6 +49,22 @@ public enum TargetCodeGeneratorLoader implements TargetCodeGenerator
         public CodeGenerator newInstance(final Ir ir, final String outputDir)
         {
             return new CppGenerator(ir, new NamespaceOutputManager(outputDir, ir.applicableNamespace()));
+        }
+    },
+
+
+    CSHARP()
+    {
+        public CodeGenerator newInstance(final Ir ir, final String outputDir)
+        {
+            return new CSharpGenerator(
+                ir,
+                System.getProperty(JAVA_ENCODING_BUFFER_TYPE, "IMutableDirectBuffer"),
+                System.getProperty(JAVA_DECODING_BUFFER_TYPE, "IDirectBuffer"),
+                Boolean.getBoolean(JAVA_GROUP_ORDER_ANNOTATION),
+                Boolean.getBoolean(JAVA_GENERATE_INTERFACES),
+                Boolean.getBoolean(DECODE_UNKNOWN_ENUM_VALUES),
+                new CSharpOutputManager(outputDir, ir.applicableNamespace()));
         }
     },
 
