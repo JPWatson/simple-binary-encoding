@@ -39,7 +39,6 @@ public class CSharpOutputManager implements OutputManager
      *
      * @param baseDirName for the generated source code.
      * @param packageName for the generated source code relative to the baseDirName.
-     * @throws IOException if an error occurs during output.
      */
     public CSharpOutputManager(final String baseDirName, final String packageName)
     {

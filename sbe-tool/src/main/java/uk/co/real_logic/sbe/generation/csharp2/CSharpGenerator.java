@@ -2097,10 +2097,10 @@ public class CSharpGenerator implements CodeGenerator
             "    protected int _actingVersion;\n";
 
         return String.format(
-            "    public static %1$s BLOCK_LENGTH = %2$s;\n" +
-            "    public static %3$s TEMPLATE_ID = %4$s;\n" +
-            "    public static %5$s SCHEMA_ID = %6$s;\n" +
-            "    public static %7$s SCHEMA_VERSION = %8$s;\n\n" +
+            "    public const %1$s BLOCK_LENGTH = %2$s;\n" +
+            "    public const %3$s TEMPLATE_ID = %4$s;\n" +
+            "    public const %5$s SCHEMA_ID = %6$s;\n" +
+            "    public const %7$s SCHEMA_VERSION = %8$s;\n\n" +
             "    private %9$s _parentMessage;\n" +
             "    private %11$s _buffer;\n" +
             "    protected int _offset;\n" +
