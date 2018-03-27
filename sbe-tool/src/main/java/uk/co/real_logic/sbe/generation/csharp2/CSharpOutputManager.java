@@ -48,7 +48,7 @@ public class CSharpOutputManager implements OutputManager
         final char lastChar = baseDirName.charAt(baseDirName.length() - 1);
         final String dirName =
             (lastChar == separatorChar ? baseDirName : baseDirName + separatorChar) +
-                packageName.replace('.', separatorChar);
+            packageName.replace('.', separatorChar);
 
         outputDir = new File(dirName);
         if (!outputDir.exists())

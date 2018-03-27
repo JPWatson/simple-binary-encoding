@@ -191,10 +191,14 @@ public class CSharpUtil
     }
 
 
-    public static String getCSharpByteOrder(ByteOrder byteOrder) {
-        if (byteOrder == ByteOrder.BIG_ENDIAN) {
+    public static String getCSharpByteOrder(final ByteOrder byteOrder)
+    {
+        if (byteOrder == ByteOrder.BIG_ENDIAN)
+        {
             return "ByteOrder.BigEndian";
-        } else {
+        }
+        else
+        {
             return "ByteOrder.LittleEndian";
         }
     }

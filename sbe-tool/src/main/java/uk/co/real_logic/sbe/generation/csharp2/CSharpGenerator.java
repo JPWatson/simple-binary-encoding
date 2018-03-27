@@ -15,8 +15,34 @@
  */
 package uk.co.real_logic.sbe.generation.csharp2;
 
+import static uk.co.real_logic.sbe.generation.csharp.CSharpUtil.toUpperFirstChar;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpGenerator.CodecType.DECODER;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpGenerator.CodecType.ENCODER;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.CSHARP_INTERFACE_PACKAGE;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.Separators;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.append;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.charset;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.csharpTypeName;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.formatClassName;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.formatPropertyName;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.generateLiteral;
+import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.getCSharpByteOrder;
+import static uk.co.real_logic.sbe.ir.GenerationUtil.collectFields;
+import static uk.co.real_logic.sbe.ir.GenerationUtil.collectGroups;
+import static uk.co.real_logic.sbe.ir.GenerationUtil.collectVarData;
+import static uk.co.real_logic.sbe.ir.GenerationUtil.concatTokens;
+import static uk.co.real_logic.sbe.ir.GenerationUtil.findEndSignal;
+import static uk.co.real_logic.sbe.ir.GenerationUtil.getMessageBody;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 import org.agrona.Verify;
 import org.agrona.generation.OutputManager;
+
 import uk.co.real_logic.sbe.PrimitiveType;
 import uk.co.real_logic.sbe.PrimitiveValue;
 import uk.co.real_logic.sbe.generation.CodeGenerator;
@@ -26,31 +52,6 @@ import uk.co.real_logic.sbe.ir.HeaderStructure;
 import uk.co.real_logic.sbe.ir.Ir;
 import uk.co.real_logic.sbe.ir.Signal;
 import uk.co.real_logic.sbe.ir.Token;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
-import static uk.co.real_logic.sbe.generation.csharp.CSharpUtil.toUpperFirstChar;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpGenerator.CodecType.DECODER;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpGenerator.CodecType.ENCODER;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.CSHARP_INTERFACE_PACKAGE;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.Separators;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.append;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.charset;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.formatClassName;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.formatPropertyName;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.generateLiteral;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.getCSharpByteOrder;
-import static uk.co.real_logic.sbe.generation.csharp2.CSharpUtil.csharpTypeName;
-import static uk.co.real_logic.sbe.ir.GenerationUtil.collectFields;
-import static uk.co.real_logic.sbe.ir.GenerationUtil.collectGroups;
-import static uk.co.real_logic.sbe.ir.GenerationUtil.collectVarData;
-import static uk.co.real_logic.sbe.ir.GenerationUtil.concatTokens;
-import static uk.co.real_logic.sbe.ir.GenerationUtil.findEndSignal;
-import static uk.co.real_logic.sbe.ir.GenerationUtil.getMessageBody;
 
 public class CSharpGenerator implements CodeGenerator
 {
@@ -364,7 +365,7 @@ public class CSharpGenerator implements CodeGenerator
             sb, groupName, parentMessageClassName, indent, dimensionsClassName, dimensionHeaderLen);
 
         sb.append(String.format(
-            indent + "    public void Wrap(\n"  +
+            indent + "    public void Wrap(\n" +
             indent + "        %s parentMessage, %s buffer)\n" +
             indent + "    {\n" +
             indent + "        this._parentMessage = parentMessage;\n" +
@@ -848,7 +849,8 @@ public class CSharpGenerator implements CodeGenerator
                 indent + "        int length = value.Length;\n" +
                 indent + "        if (length > %3$d)\n" +
                 indent + "        {\n" +
-                indent + "            throw new InvalidOperationException(\"length > maxValue for type: \" + length);\n" +
+                indent + "            throw new InvalidOperationException" +
+                "(\"length > maxValue for type: \" + length);\n" +
                 indent + "        }\n\n" +
                 indent + "        int headerLength = %4$d;\n" +
                 indent + "        int limit = _parentMessage.Limit();\n" +
@@ -873,7 +875,8 @@ public class CSharpGenerator implements CodeGenerator
                 indent + "        int length = bytes.Length;\n" +
                 indent + "        if (length > %4$d)\n" +
                 indent + "        {\n" +
-                indent + "            throw new InvalidOperationException(\"length > maxValue for type: \" + length);\n" +
+                indent + "            throw new InvalidOperationException" +
+                "(\"length > maxValue for type: \" + length);\n" +
                 indent + "        }\n\n" +
                 indent + "        int headerLength = %5$d;\n" +
                 indent + "        int limit = _parentMessage.Limit();\n" +
@@ -1458,7 +1461,8 @@ public class CSharpGenerator implements CodeGenerator
         final boolean addFlagsAttribute)
     {
         String result = "";
-        if (addFlagsAttribute) {
+        if (addFlagsAttribute)
+        {
             result += INDENT + "[Flags]\n";
         }
 
@@ -1711,7 +1715,7 @@ public class CSharpGenerator implements CodeGenerator
                 indent + "        if (dstOffset < 0 || dstOffset > (dst.Length - length))\n" +
                 indent + "        {\n" +
                 indent + "            throw new IndexOutOfRangeException(" +
-                                          "\"Copy will go out of range: offset=\" + dstOffset);\n" +
+                "\"Copy will go out of range: offset=\" + dstOffset);\n" +
                 indent + "        }\n\n" +
                 "%s" +
                 indent + "        _buffer.GetBytes(this._offset + %d, dst, dstOffset, length);\n\n" +
@@ -1758,7 +1762,7 @@ public class CSharpGenerator implements CodeGenerator
 
     private String byteOrderString(final Encoding encoding)
     {
-        return sizeOfPrimitive(encoding) == 1 ? "" : ", "+ getCSharpByteOrder(encoding.byteOrder());
+        return sizeOfPrimitive(encoding) == 1 ? "" : ", " + getCSharpByteOrder(encoding.byteOrder());
     }
 
     private CharSequence generatePrimitiveArrayPropertyEncode(
@@ -1820,7 +1824,7 @@ public class CSharpGenerator implements CodeGenerator
             indent + "        if (srcOffset < 0 || srcOffset > (src.Length - length))\n" +
             indent + "        {\n" +
             indent + "            throw new IndexOutOfRangeException(" +
-                                      "\"Copy will go out of range: offset=\" + srcOffset);\n" +
+            "\"Copy will go out of range: offset=\" + srcOffset);\n" +
             indent + "        }\n\n" +
             indent + "        _buffer.PutBytes(this._offset + %d, src, srcOffset, length);\n\n" +
             indent + "        return this;\n" +
@@ -1841,7 +1845,7 @@ public class CSharpGenerator implements CodeGenerator
                 indent + "        if (srcLength > length)\n" +
                 indent + "        {\n" +
                 indent + "            throw new IndexOutOfRangeException(" +
-                                          "\"String too large for copy: byte length=\" + srcLength);\n" +
+                "\"String too large for copy: byte length=\" + srcLength);\n" +
                 indent + "        }\n\n" +
                 indent + "        _buffer.PutStringWithoutLengthAscii(this._offset + %4$d, src);\n\n" +
                 indent + "        for (int start = srcLength; start < length; ++start)\n" +
@@ -1866,7 +1870,7 @@ public class CSharpGenerator implements CodeGenerator
                 indent + "        if (bytes.Length > length)\n" +
                 indent + "        {\n" +
                 indent + "            throw new IndexOutOfRangeException(" +
-                                          "\"String too large for copy: byte length=\" + bytes.length);\n" +
+                "\"String too large for copy: byte length=\" + bytes.length);\n" +
                 indent + "        }\n\n" +
                 indent + "        buffer.PutBytes(this._offset + %d, bytes, 0, bytes.length);\n\n" +
                 indent + "        for (int start = bytes.length; start < length; ++start)\n" +
@@ -2355,7 +2359,8 @@ public class CSharpGenerator implements CodeGenerator
             encoding.presence().toString().toLowerCase()));
     }
 
-    private String namespace() {
+    private String namespace()
+    {
         // Preserve '.' but upcase between them
         String[] tokens = ir.applicableNamespace().split("\\.");
         final StringBuilder sb = new StringBuilder();
@@ -2404,7 +2409,8 @@ public class CSharpGenerator implements CodeGenerator
                 namespace(),
                 signalToken.encoding().constValue().toString());
         }
-        else {
+        else
+        {
             return String.format(
                 "\n" +
                     indent + "    public %1$s %2$s()\n" +
@@ -2438,8 +2444,10 @@ public class CSharpGenerator implements CodeGenerator
     }
 
     private CharSequence generateEnumEncoder(
-        final String containingClassName, final String propertyName, final Token token, final String indent) {
-        if (token.isConstantEncoding()) {
+        final String containingClassName, final String propertyName, final Token token, final String indent)
+    {
+        if (token.isConstantEncoding())
+        {
             return "";
         }
 
@@ -2592,7 +2600,7 @@ public class CSharpGenerator implements CodeGenerator
                 return "_buffer.PutInt(" + index + ", " + value + byteOrder + ")";
 
             case UINT32:
-                return "_buffer.PutInt(" + index + ", unchecked((int)" + value + ")"+ byteOrder + ")";
+                return "_buffer.PutInt(" + index + ", unchecked((int)" + value + ")" + byteOrder + ")";
 
             case FLOAT:
                 return "_buffer.PutFloat(" + index + ", " + value + byteOrder + ")";
@@ -2791,20 +2799,19 @@ public class CSharpGenerator implements CodeGenerator
         tokens
             .stream()
             .filter((token) -> token.signal() == Signal.CHOICE)
-            .forEach(
-                (token) ->
-                {
-                    final String choiceName = formatPropertyName(token.name());
-                    append(sb, indent, "    if (" + choiceName + "())");
-                    append(sb, indent, "    {");
-                    append(sb, indent, "        if (atLeastOne)");
-                    append(sb, indent, "        {");
-                    Separators.ENTRY.appendToGeneratedBuilder(sb, indent + INDENT + INDENT + INDENT, "builder");
-                    append(sb, indent, "        }");
-                    append(sb, indent, "        builder.Append(\"" + choiceName + "\");");
-                    append(sb, indent, "        atLeastOne = true;");
-                    append(sb, indent, "    }");
-                });
+            .forEach(token ->
+            {
+                final String choiceName = formatPropertyName(token.name());
+                append(sb, indent, "    if (" + choiceName + "())");
+                append(sb, indent, "    {");
+                append(sb, indent, "        if (atLeastOne)");
+                append(sb, indent, "        {");
+                Separators.ENTRY.appendToGeneratedBuilder(sb, indent + INDENT + INDENT + INDENT, "builder");
+                append(sb, indent, "        }");
+                append(sb, indent, "        builder.Append(\"" + choiceName + "\");");
+                append(sb, indent, "        atLeastOne = true;");
+                append(sb, indent, "    }");
+            });
 
         Separators.END_SET.appendToGeneratedBuilder(sb, indent + INDENT, "builder");
         sb.append('\n');
@@ -3007,7 +3014,7 @@ public class CSharpGenerator implements CodeGenerator
                     else
                     {
                         Separators.BEGIN_ARRAY.appendToGeneratedBuilder(sb, indent, "builder");
-                        append(sb, indent, "if (" +  fieldName + "Length() > 0)");
+                        append(sb, indent, "if (" + fieldName + "Length() > 0)");
                         append(sb, indent, "{");
                         append(sb, indent, "    for (int i = 0; i < " + fieldName + "Length(); i++)");
                         append(sb, indent, "    {");
