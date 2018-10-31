@@ -548,7 +548,7 @@ public class TypeScriptGenerator implements CodeGenerator
         final StringBuilder sb = new StringBuilder();
 
         generateGroupDecoderClassHeader(sb, groupName, outerClassName, groupToken, dimensionsToken, "");
-        sb.append(generateDecoderFields(fields,  ""));
+        sb.append(generateDecoderFields(fields, ""));
         generateDecoderGroups(sb, outerClassName, "this.parentMessage", groups, "");
         sb.append(generateDecoderVarData(varData, ""));
         // TODO
